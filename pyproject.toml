@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kyber-pqc-kem-engine"
+version = "2.0.0"
+description = "ML-KEM / CRYSTALS-Kyber Post-Quantum Key Encapsulation Mechanism & Hybrid TLS Engine"
+readme = "README.md"
+authors = [{ name = "Dr. Abu Suraih Sakhri", email = "abusuraih@example.com" }]
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Security/Cryptography",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.9"
+dependencies = []
+
+[project.scripts]
+kyber-pqc-kem-engine = "kyber_pqc_kem.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/abusuraihsakhri/kyber-pqc-kem-engine"
+Repository = "https://github.com/abusuraihsakhri/kyber-pqc-kem-engine.git"
