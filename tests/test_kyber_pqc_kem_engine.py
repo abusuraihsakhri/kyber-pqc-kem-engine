@@ -8,7 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import pytest
-from agents.base import PHIGuard, AuditLogger, SecurityException
+from agents.base import PHIGuard, AuditLogger, AuditTrail, SecurityException
 from agents.models import SystemTaskPayload, UrgencyLevel, SystemIntegrityStatus
 from agents.workers import InvariantQCWorker, SafetyEscalationWorker, ProtocolConformanceWorker
 from agents.supervisor import SystemSupervisor
@@ -21,6 +21,16 @@ def test_phi_guard_enforcement():
 
     # Clean text passes
     PHIGuard.assert_no_phi("Analytical assay specimen KEY-001 optimal")
+
+
+def test_phi_redaction():
+    """Test PHI redaction replaces sensitive identifiers."""
+    text_with_phi = "Patient John Doe MRN-994827 has phone 555-123-4567"
+    redacted = PHIGuard.redact_phi(text_with_phi)
+    assert "John Doe" not in redacted
+    assert "MRN-994827" not in redacted
+    assert "555-123-4567" not in redacted
+    assert "[REDACTED_IDENTIFIER]" in redacted
 
 
 def test_specialized_workers():
@@ -63,3 +73,39 @@ def test_supervisor_consensus_and_audit():
     assert main(["audit", "--task-id", "CLI-TEST-01"]) == 0
     assert main(["chat", "Explain", "specifications"]) == 0
     assert main(["verify-audit"]) == 0
+
+
+def test_audit_trail_signature_verification():
+    """Test that audit trail verifies HMAC signatures, not just chain linkage."""
+    trail = AuditTrail(secret_key="test-secret-key-for-verification")
+    trail.log("test_actor", "tier1", "TEST_EVENT", {"data": "value1"})
+    trail.log("test_actor", "tier1", "TEST_EVENT", {"data": "value2"})
+
+    # Valid trail should pass verification
+    assert trail.verify_integrity() is True
+
+    # Tamper with an entry's payload_hash
+    original_hash = trail.logs[0]["payload_hash"]
+    trail.logs[0]["payload_hash"] = "tampered_hash_value"
+
+    # Tampered trail should fail verification
+    assert trail.verify_integrity() is False
+
+    # Restore and verify again
+    trail.logs[0]["payload_hash"] = original_hash
+    assert trail.verify_integrity() is True
+
+
+def test_audit_trail_uses_secure_random_key_by_default():
+    """Test that AuditTrail generates secure random key when none provided."""
+    trail1 = AuditTrail()
+    trail2 = AuditTrail()
+    # Two instances without explicit key should have different keys
+    assert trail1.secret_key != trail2.secret_key
+
+
+def test_audit_trail_empty_is_valid():
+    """Test that empty audit trail passes integrity check."""
+    trail = AuditTrail(secret_key="test-key")
+    assert trail.verify_integrity() is True
+    assert len(trail.get_trail()) == 0

@@ -8,3 +8,12 @@ output.csv
 dist/
 build/
 *.egg-info/
+
+# Environment files (may contain secrets)
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db

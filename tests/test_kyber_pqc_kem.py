@@ -6,7 +6,7 @@ import pytest
 from kyber_pqc_kem.models import FrontierPayload, ExecutionStatus
 from kyber_pqc_kem.engine import FrontierDomainEngine
 from kyber_pqc_kem.agents import LatticePolynomialAgent, NTTVectorTransformAgent, DecapsulationIntegrityAgent, PQCKeyAgreementCoordinator
-from kyber_pqc_kem.cli import main
+from kyber_pqc_kem.cli import main, _safe_resolve_path
 
 
 def test_sub_agents():
@@ -42,3 +42,18 @@ def test_coordinator():
 def test_cli():
     assert main(["audit", "--task-id", "CLI-01"]) == 0
     assert main(["chat", "What", "is", "the", "system", "status?"]) == 0
+
+
+def test_safe_path_resolution():
+    """Test that path resolution validates file existence."""
+    # Existing file should resolve
+    existing = _safe_resolve_path("sample.csv", must_exist=True)
+    assert existing.exists()
+
+    # Non-existing file with must_exist=True should raise
+    with pytest.raises(Exception):
+        _safe_resolve_path("nonexistent_file_xyz.csv", must_exist=True)
+
+    # Non-existing file with must_exist=False should resolve
+    non_existing = _safe_resolve_path("output_results.csv", must_exist=False)
+    assert not non_existing.exists()

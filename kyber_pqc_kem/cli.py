@@ -5,10 +5,24 @@ import argparse
 import csv
 import json
 import sys
+from pathlib import Path
 from .models import FrontierPayload
 from .agents import PQCKeyAgreementCoordinator
 
 coordinator = PQCKeyAgreementCoordinator()
+
+
+def _safe_resolve_path(file_path: str, must_exist: bool = False) -> Path:
+    """Resolve and validate file path, preventing path traversal."""
+    try:
+        resolved = Path(file_path).resolve()
+    except (OSError, ValueError) as e:
+        raise argparse.ArgumentTypeError(f"Invalid path: {e}")
+
+    if must_exist and not resolved.exists():
+        raise argparse.ArgumentTypeError(f"File not found: {resolved}")
+
+    return resolved
 
 
 def main(argv=None):
@@ -69,7 +83,9 @@ def main(argv=None):
         return 0
 
     if args.command == "batch":
-        with open(args.input, mode="r", encoding="utf-8-sig") as f:
+        input_path = _safe_resolve_path(args.input, must_exist=True)
+        output_path = _safe_resolve_path(args.output, must_exist=False)
+        with open(input_path, mode="r", encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
             fieldnames = list(reader.fieldnames or [])
             rows = list(reader)
@@ -93,11 +109,11 @@ def main(argv=None):
             row_dict["consensus_summary"] = dossier["consensus_summary"]
             out_rows.append(row_dict)
 
-        with open(args.output, mode="w", encoding="utf-8", newline="") as f:
+        with open(output_path, mode="w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=out_fields)
             writer.writeheader()
             writer.writerows(out_rows)
-        print(f"Processed {len(out_rows)} records -> {args.output}")
+        print(f"Processed {len(out_rows)} records -> {output_path}")
         return 0
 
     if args.command == "serve":
