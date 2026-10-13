@@ -93,7 +93,7 @@ class PQCKeyAgreementCoordinator:
             "critical_count": crit_count,
             "warning_count": warn_count,
             "alerts": [a.to_dict() for a in all_alerts],
-            "standard_specification": "NIST FIPS 203 (ML-KEM Standard)",
+            "standard_specification": "NIST FIPS 203 reference only; no ML-KEM testing performed",
             "consensus_summary": f"Consensus evaluation completed across 3 sub-agents with status [{status.value}].",
         }
 
