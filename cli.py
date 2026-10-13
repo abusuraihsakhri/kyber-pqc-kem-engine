@@ -15,7 +15,7 @@ supervisor = SystemSupervisor(model_provider="mock")
 
 
 def _safe_resolve_path(file_path: str, must_exist: bool = False) -> Path:
-    """Resolve and validate file path, preventing path traversal."""
+    """Resolve a user-selected filesystem path; this is not a sandbox boundary."""
     try:
         resolved = Path(file_path).resolve()
     except (OSError, ValueError) as e:
@@ -25,6 +25,18 @@ def _safe_resolve_path(file_path: str, must_exist: bool = False) -> Path:
         raise argparse.ArgumentTypeError(f"File not found: {resolved}")
 
     return resolved
+
+
+def parse_csv_bool(value: str) -> bool:
+    """Interpret CSV boolean cells without Python's truthiness-of-string trap."""
+    if isinstance(value, bool):
+        return value
+    value = str(value or "").strip().lower()
+    if value in {"", "0", "false", "no", "n", "off"}:
+        return False
+    if value in {"1", "true", "yes", "y", "on"}:
+        return True
+    raise ValueError(f"Invalid is_critical_flag value: {value!r}")
 
 
 def main(argv=None):
@@ -92,7 +104,7 @@ def main(argv=None):
         trail = AuditLogger.get_trail()
         valid = AuditLogger.verify_integrity()
         print(f"Audit Trail Blocks: {len(trail)} | Cryptographic Integrity Verified: {valid}")
-        return 0
+        return 0 if valid else 1
 
     if args.command == "batch":
         input_path = _safe_resolve_path(args.input, must_exist=True)
@@ -102,7 +114,7 @@ def main(argv=None):
             fieldnames = list(reader.fieldnames or [])
             rows = list(reader)
 
-        out_fields = fieldnames + ["overall_urgency", "integrity_status", "total_alerts", "audit_hash"]
+        out_fields = list(dict.fromkeys(fieldnames + ["overall_urgency", "integrity_status", "total_alerts", "audit_hash"]))
         out_rows = []
         for r in rows:
             payload = SystemTaskPayload(
@@ -111,7 +123,7 @@ def main(argv=None):
                 primary_metric=float(r.get("primary_metric", 15.0)),
                 secondary_metric=float(r.get("secondary_metric", 5.0)),
                 status_descriptor=r.get("status_descriptor", "NOMINAL"),
-                is_critical_flag=bool(r.get("is_critical_flag", False)),
+                is_critical_flag=parse_csv_bool(r.get("is_critical_flag", False)),
             )
             dossier = supervisor.process_task(payload)
             row_dict = dict(r)
@@ -120,6 +132,9 @@ def main(argv=None):
             row_dict["total_alerts"] = dossier.total_alerts
             row_dict["audit_hash"] = dossier.audit_hash
             out_rows.append(row_dict)
+
+        if input_path == output_path:
+            raise ValueError("Input and output paths must differ to avoid overwriting source data")
 
         with open(output_path, mode="w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=out_fields)
