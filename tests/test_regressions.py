@@ -79,10 +79,7 @@ def test_api_rejects_nonfinite_metrics():
     from fastapi.testclient import TestClient
     from agents.api import app
     client = TestClient(app)
-    result = client.post("/api/audit", json={
-        "task_id": "t", "target_identifier": "key",
-        "primary_metric": 1e309,
-    })
+    result = client.post("/api/audit", content='{"task_id":"t","target_identifier":"key","primary_metric":1e309}', headers={"content-type":"application/json"})
     assert result.status_code == 422
 
 
