@@ -1,236 +1,149 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kyber Pqc Kem Engine — Operations Console</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #090d16;
-            --card: #111827;
-            --border: #1f293d;
-            --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.25);
-            --text: #f3f4f6;
-            --text-muted: #9ca3af;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --success: #10b981;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            padding: 2rem;
-            min-height: 100vh;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        .header-title h1 { font-size: 1.6rem; font-weight: 700; color: #fff; }
-        .header-title p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem; }
-        .badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            background: var(--accent-glow);
-            color: var(--accent);
-            border: 1px solid var(--accent);
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            gap: 1.5rem;
-        }
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-        .card h2 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
-        input, select, textarea {
-            width: 100%;
-            padding: 0.65rem 0.9rem;
-            background: #0d1322;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: #fff;
-            font-family: inherit;
-            font-size: 0.9rem;
-        }
-        input:focus, textarea:focus { outline: none; border-color: var(--accent); }
-        .btn {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            padding: 0.7rem 1.4rem;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            width: 100%;
-        }
-        .btn:hover { background: #2563eb; }
-        .terminal {
-            background: #060911;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            color: #10b981;
-            height: 380px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-        }
-        .metrics-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .metric-box {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            text-align: center;
-        }
-        .metric-val { font-size: 1.4rem; font-weight: 700; color: #fff; margin-top: 0.25rem; }
-        .metric-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Kyber PQC KEM Engine — Telemetry Rules Demo</title>
+  <style>
+    :root {font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#f0f4ff;background:#0b1220;line-height:1.5}
+    *{box-sizing:border-box}
+    body{max-width:1120px;margin:0 auto;padding:28px 20px}
+    header{margin-bottom:24px;border-bottom:1px solid #334155;padding-bottom:20px}
+    h1{font-size:clamp(1.5rem,3vw,2.15rem);margin:0 0 8px}
+    h2{font-size:1.1rem;margin:0 0 18px}
+    p{color:#cbd5e1;margin:8px 0}
+    .notice{border-left:4px solid #eab308;background:#283016;padding:12px 16px;margin-top:16px;color:#fef9c3}
+    main{display:grid;grid-template-columns:minmax(270px,1fr) minmax(320px,1.15fr);gap:18px}
+    section{background:#151f30;border:1px solid #354459;border-radius:12px;padding:22px}
+    label{display:block;font-weight:600;font-size:.92rem;margin-top:14px;margin-bottom:5px}
+    input:not([type="checkbox"]){width:100%;padding:10px 12px;border:1px solid #64748b;border-radius:6px;background:#0b1220;color:#fff;font:inherit}
+    input:focus-visible,button:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
+    .checkrow{display:flex;gap:10px;align-items:center;margin:18px 0}
+    .checkrow label{margin:0}
+    input[type="checkbox"]{width:19px;height:19px}
+    button{font:inherit;font-weight:700;border-radius:7px;border:1px solid #60a5fa;background:#2563eb;color:white;padding:10px 16px;cursor:pointer}
+    button:hover{background:#1d4ed8}
+    button.secondary{background:transparent;border-color:#64748b}
+    button.secondary:hover{background:#334155}
+    .buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+    pre{overflow:auto;background:#080f1c;border:1px solid #334155;padding:15px;border-radius:8px;white-space:pre-wrap;overflow-wrap:anywhere;min-height:250px;font-size:.88rem}
+    .stats{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 16px}
+    .stat{background:#0b1220;padding:10px 12px;border-radius:7px;border:1px solid #334155}
+    .stat strong{display:block;font-size:1.5rem}
+    #error{color:#fecaca;min-height:1.5em}
+    .hint,footer{font-size:.88rem;color:#94a3b8}
+    footer{margin-top:20px}
+    @media(max-width:760px){main{grid-template-columns:1fr}body{padding:18px 12px}section{padding:16px}}
+  </style>
 </head>
 <body>
+  <header>
+    <h1>Telemetry Rules Demo</h1>
+    <p>kyber-pqc-kem-engine · Local deterministic threshold and descriptor evaluation</p>
+    <div class="notice"><strong>Not an ML-KEM implementation.</strong> No key generation, encapsulation, decapsulation, TLS negotiation, or FIPS 203 conformance testing is performed. All calculations run locally in your browser. Do not enter secrets or personal data.</div>
+  </header>
+  <main>
+    <section aria-labelledby="input-heading">
+      <h2 id="input-heading">Evaluate telemetry</h2>
+      <form id="audit-form">
+        <label for="task_id">Task ID</label>
+        <input id="task_id" required maxlength="100" value="TASK-DEMO-001">
+        <label for="target_id">Target identifier</label>
+        <input id="target_id" required maxlength="100" value="KEY-DEMO-01">
+        <label for="primary_metric">Primary metric · alert if greater than 25</label>
+        <input id="primary_metric" type="number" step="any" required value="29.4">
+        <label for="secondary_metric">Secondary metric · alert if greater than 12</label>
+        <input id="secondary_metric" type="number" step="any" required value="14.8">
+        <label for="status_descriptor">Status descriptor · flags anomaly keywords</label>
+        <input id="status_descriptor" maxlength="200" value="DISCORDANT_ANOMALY">
+        <div class="checkrow"><input type="checkbox" id="is_critical" checked><label for="is_critical">Critical escalation flag</label></div>
+        <div class="buttons"><button type="submit">Evaluate</button><button type="button" id="download" class="secondary" disabled>Export JSON</button></div>
+        <p id="error" role="alert"></p>
+      </form>
+    </section>
+    <section aria-labelledby="result-heading">
+      <h2 id="result-heading">Evaluation result</h2>
+      <div class="stats" aria-label="Session counters">
+        <div class="stat"><small>Evaluations</small><strong id="count">0</strong></div>
+        <div class="stat"><small>Latest alerts</small><strong id="alerts">0</strong></div>
+      </div>
+      <pre id="output" role="status" aria-live="polite">Enter metrics and select Evaluate. No processing has occurred yet.</pre>
+      <p class="hint">Results are heuristic flags, not cryptographic security assessments. Nothing is uploaded; session counters reset when the page reloads.</p>
+    </section>
+  </main>
+  <footer>Demonstration thresholds: primary &gt; 25; secondary &gt; 12; descriptor includes DISCORDANT, ANOMALY, MUTANT, VIOLATION, FAIL, or REJECT. The critical flag takes priority. See the repository for the Python audit and HMAC-based process-local log.</footer>
+  <script>
+    "use strict";
+    const form = document.getElementById("audit-form");
+    const output = document.getElementById("output");
+    const error = document.getElementById("error");
+    let count = 0;
+    let latest = null;
 
-    <div class="header">
-        <div class="header-title">
-            <h1>Kyber Pqc Kem Engine</h1>
-            <p>Domain: Clinical & Cryptographic AI | Standard: CAP / CLSI / NIST Standards | LabMind-Atlas Architecture</p>
-        </div>
-        <div>
-            <span class="badge">Air-Gapped Active</span>
-            <span class="badge" style="background: rgba(16,185,129,0.2); color: #10b981; border-color: #10b981;">Zero-PHI Guard Active</span>
-        </div>
-    </div>
+    function evaluate(data) {
+      const alerts = [];
+      if (data.primary_metric > 25) {
+        alerts.push({origin_worker:"InvariantQCWorker", urgency:"ELEVATED_RISK", summary:"Primary metric exceeds local demonstration threshold of 25"});
+      }
+      if (data.is_critical_flag || data.secondary_metric > 12) {
+        alerts.push({origin_worker:"SafetyEscalationWorker", urgency:data.is_critical_flag?"CRITICAL_STAT_PANIC":"ELEVATED_RISK", summary:"Critical flag or secondary metric threshold triggered"});
+      }
+      if (["DISCORDANT","ANOMALY","MUTANT","VIOLATION","FAIL","REJECT"].some(word => data.status_descriptor.toUpperCase().includes(word))) {
+        alerts.push({origin_worker:"ProtocolConformanceWorker", urgency:"ELEVATED_RISK", summary:"Status descriptor matches local anomaly keyword"});
+      }
+      const overall = alerts.some(a => a.urgency === "CRITICAL_STAT_PANIC") ? "CRITICAL_STAT_PANIC"
+        : alerts.length ? "ELEVATED_RISK" : "ROUTINE";
+      return {
+        type:"local_telemetry_demonstration",
+        task_id:data.task_id,
+        target_identifier:data.target_identifier,
+        overall_urgency:overall,
+        integrity_status:overall === "CRITICAL_STAT_PANIC" ? "RECALIBRATION_REQUIRED" : overall === "ELEVATED_RISK" ? "DISCORDANT_ANOMALY" : "VALIDATED_OPTIMAL",
+        total_alerts:alerts.length,
+        alerts:alerts,
+        disclaimer:"No ML-KEM, FIPS validation, or HMAC signing was performed."
+      };
+    }
 
-    <div class="metrics-bar">
-        <div class="metric-box">
-            <div class="metric-label">System Status</div>
-            <div class="metric-val" style="color: var(--success);" id="m-status">OPTIMAL</div>
-        </div>
-        <div class="metric-box">
-            <div class="metric-label">Tasks Processed</div>
-            <div class="metric-val" id="m-tasks">142</div>
-        </div>
-        <div class="metric-box">
-            <div class="metric-label">Audit Blocks Signed</div>
-            <div class="metric-val" id="m-audit">142</div>
-        </div>
-        <div class="metric-box">
-            <div class="metric-label">PHI Interceptions</div>
-            <div class="metric-val" style="color: var(--accent);" id="m-phi">0</div>
-        </div>
-    </div>
-
-    <div class="grid">
-        <div class="card">
-            <h2>⚙️ Dispatch Distributed Component Audit</h2>
-            <div class="form-group">
-                <label>Task / Sample ID</label>
-                <input type="text" id="task_id" value="TASK-2026-LIVE-01">
-            </div>
-            <div class="form-group">
-                <label>Target Identifier</label>
-                <input type="text" id="target_id" value="SPECIMEN-ALPHA-77">
-            </div>
-            <div class="form-group">
-                <label>Primary Measurement / Value</label>
-                <input type="number" id="primary_metric" value="29.4" step="0.1">
-            </div>
-            <div class="form-group">
-                <label>Secondary Metric / Kinetic Index</label>
-                <input type="number" id="secondary_metric" value="14.8" step="0.1">
-            </div>
-            <div class="form-group">
-                <label>Status / Phenotype Descriptor</label>
-                <input type="text" id="status_descriptor" value="DISCORDANT_ANOMALY">
-            </div>
-            <div class="form-group">
-                <label><input type="checkbox" id="is_critical" checked> Trigger Emergency / Critical Flag</label>
-            </div>
-            <button class="btn" onclick="runAudit()">Execute Distributed Component Audit</button>
-        </div>
-
-        <div class="card">
-            <h2>📊 Real-Time Consensus Dossier & Audit Log</h2>
-            <div class="terminal" id="outputConsole">// Kyber Pqc Kem Engine Operations Console Ready
-// Connection established with Air-Gapped Supervisor
-// Cryptographic HMAC-SHA256 audit ledger loaded.
-// Ready for live task payload dispatch...</div>
-        </div>
-    </div>
-
-    <script>
-        async function runAudit() {
-            const consoleEl = document.getElementById('outputConsole');
-            consoleEl.innerText = "// Dispatching task across specialized workers...
-// Invoking InvariantQCWorker, SafetyEscalationWorker, ProtocolWorker...";
-
-            const payload = {
-                task_id: document.getElementById('task_id').value,
-                target_identifier: document.getElementById('target_id').value,
-                primary_metric: parseFloat(document.getElementById('primary_metric').value),
-                secondary_metric: parseFloat(document.getElementById('secondary_metric').value),
-                status_descriptor: document.getElementById('status_descriptor').value,
-                is_critical_flag: document.getElementById('is_critical').checked
-            };
-
-            try {
-                const res = await fetch('/api/audit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                consoleEl.innerText = JSON.stringify(data, null, 2);
-                document.getElementById('m-tasks').innerText = parseInt(document.getElementById('m-tasks').innerText) + 1;
-                document.getElementById('m-audit').innerText = parseInt(document.getElementById('m-audit').innerText) + 1;
-            } catch (err) {
-                consoleEl.innerText = "// Offline / Simulation Output:\n" + JSON.stringify({
-                    dossier_id: "DOSSIER-SIM-" + Math.floor(Math.random()*10000),
-                    system: "kyber-pqc-kem-engine",
-                    domain: "Clinical & Cryptographic AI",
-                    task_id: payload.task_id,
-                    overall_urgency: payload.is_critical_flag ? "CRITICAL_STAT_PANIC" : "ELEVATED_RISK",
-                    integrity_status: "DISCORDANT_ANOMALY",
-                    alerts: [
-                        { worker: "InvariantQCWorker", alert: "Primary metric exceeds upper reference bound" },
-                        { worker: "SafetyEscalationWorker", alert: "Critical emergency interlock flag active" }
-                    ],
-                    audit_hash: "HMAC_SHA256_e83f9a72b941d6c381f9"
-                }, null, 2);
-            }
-        }
-    </script>
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+      error.textContent = "";
+      const primary = Number(document.getElementById("primary_metric").value);
+      const secondary = Number(document.getElementById("secondary_metric").value);
+      if (!form.reportValidity() || !Number.isFinite(primary) || !Number.isFinite(secondary)) {
+        error.textContent = "Enter valid finite numerical metrics.";
+        return;
+      }
+      const data = {
+        task_id:document.getElementById("task_id").value.trim(),
+        target_identifier:document.getElementById("target_id").value.trim(),
+        primary_metric:primary,
+        secondary_metric:secondary,
+        status_descriptor:document.getElementById("status_descriptor").value.trim(),
+        is_critical_flag:document.getElementById("is_critical").checked
+      };
+      if (!data.task_id || !data.target_identifier) {
+        error.textContent = "Task ID and target identifier are required.";
+        return;
+      }
+      latest = evaluate(data);
+      count += 1;
+      document.getElementById("count").textContent = String(count);
+      document.getElementById("alerts").textContent = String(latest.total_alerts);
+      output.textContent = JSON.stringify(latest,null,2);
+      document.getElementById("download").disabled = false;
+    });
+    document.getElementById("download").addEventListener("click", function() {
+      if (!latest) return;
+      const blob = new Blob([JSON.stringify(latest,null,2)+"\n"],{type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "telemetry-evaluation.json";
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+  </script>
 </body>
 </html>
