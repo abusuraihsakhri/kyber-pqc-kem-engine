@@ -1,5 +1,5 @@
 """
-Core Algorithmic Engine & Cryptographic / Biological Logic for ML-KEM / CRYSTALS-Kyber Post-Quantum Key Encapsulation Mechanism & Hybrid TLS Engine.
+Legacy numerical threshold evaluator; does not implement ML-KEM.
 Domain: Post-Quantum Cryptography
 Standard: NIST FIPS 203 (ML-KEM Standard)
 """
