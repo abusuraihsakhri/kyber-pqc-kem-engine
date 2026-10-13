@@ -84,3 +84,19 @@ def test_api_rejects_nonfinite_metrics():
         "primary_metric": 1e309,
     })
     assert result.status_code == 422
+
+
+def test_audit_trail_rejects_missing_or_ambiguous_fields():
+    trail = AuditTrail("test-key")
+    trail.log("a|b", "tier", "event", {"value": 3})
+    trail.logs[0]["actor"] = "a"
+    trail.logs[0]["actor_tier"] = "b|tier"
+    assert not trail.verify_integrity()
+    trail.logs[0].pop("actor_tier")
+    assert not trail.verify_integrity()
+
+
+def test_simulator_rejects_zero_iterations():
+    from simulator import run_simulation
+    with pytest.raises(ValueError, match="positive"):
+        run_simulation(0)
