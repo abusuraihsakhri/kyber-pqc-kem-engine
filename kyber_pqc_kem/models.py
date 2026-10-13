@@ -40,7 +40,7 @@ class AgentTelemetryAlert:
     summary: str
     technical_details: str
     actionable_remediation: str
-    standard_reference: str = "NIST FIPS 203 (ML-KEM Standard)"
+    standard_reference: str = "Local telemetry demonstration (not FIPS 203 conformance)"
     timestamp: str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
 
     def to_dict(self) -> Dict[str, Any]:
