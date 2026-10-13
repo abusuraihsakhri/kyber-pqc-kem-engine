@@ -14,7 +14,7 @@ def create_app():
         from pydantic import BaseModel, Field
 
         app = FastAPI(
-            title="ML-KEM / CRYSTALS-Kyber Post-Quantum Key Encapsulation Mechanism & Hybrid TLS Engine",
+            title="Legacy telemetry rules demo (not ML-KEM cryptography)",
             description="Legacy threshold-based telemetry API. Does not perform ML-KEM operations or hybrid TLS.",
             version="2.0.0-FRONTIER",
         )
