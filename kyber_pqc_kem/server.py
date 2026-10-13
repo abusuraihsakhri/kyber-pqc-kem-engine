@@ -1,5 +1,5 @@
 """
-FastAPI REST API Server for ML-KEM / CRYSTALS-Kyber Post-Quantum Key Encapsulation Mechanism & Hybrid TLS Engine.
+Legacy FastAPI telemetry interface; no ML-KEM primitives are executed.
 """
 from typing import Dict, Any
 from .models import FrontierPayload
