@@ -1,5 +1,5 @@
 """
-Command-Line Interface for ML-KEM / CRYSTALS-Kyber Post-Quantum Key Encapsulation Mechanism & Hybrid TLS Engine.
+Command-Line Interface for Kyber-named legacy telemetry rules demonstration (no key encapsulation).
 """
 import argparse
 import csv
@@ -78,7 +78,7 @@ def main(argv=None):
         dossier = coordinator.process(payload)
         print("=" * 80)
         print(f"  ML-KEM / CRYSTALS-KYBER POST-QUANTUM KEY ENCAPSULATION MECHANISM & HYBRID TLS ENGINE")
-        print(f"  Domain: Post-Quantum Cryptography | Standard: NIST FIPS 203 (ML-KEM Standard)")
+        print(f"  Local threshold demonstration; not an FIPS 203 test")
         print(f"  Task: {dossier['task_id']} | Status: [{dossier['overall_status']}] | Total Alerts: {dossier['total_alerts']}")
         print("=" * 80)
         for a in dossier["alerts"]:
