@@ -9,6 +9,7 @@ import time
 import hmac
 import hashlib
 import secrets
+import copy
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timezone
 from pydantic import BaseModel, Field
@@ -67,7 +68,9 @@ class AuditTrail:
         self.logs: List[Dict[str, Any]] = []
 
     def log(self, actor: str, actor_tier: str, event_type: str, details: Dict[str, Any]) -> Dict[str, Any]:
-        payload_str = json.dumps(details, sort_keys=True)
+        for value in (actor, actor_tier, event_type):
+            assert_no_phi(value)
+        payload_str = json.dumps(details, sort_keys=True, allow_nan=False)
         assert_no_phi(payload_str)
         payload_hash = hashlib.sha256(payload_str.encode("utf-8")).hexdigest()
         audit_id = f"AUDIT-{int(time.time()*1000)}-{len(self.logs)+1}"
@@ -103,7 +106,7 @@ class AuditTrail:
         return True
 
     def get_trail(self) -> List[Dict[str, Any]]:
-        return self.logs
+        return copy.deepcopy(self.logs)
 
 
 GLOBAL_AUDIT = AuditTrail()
