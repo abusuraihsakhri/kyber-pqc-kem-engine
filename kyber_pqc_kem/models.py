@@ -26,6 +26,11 @@ class FrontierPayload:
     attributes: Dict[str, Any] = field(default_factory=dict)
     timestamp: str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
 
+    def __post_init__(self):
+        import math
+        if not (math.isfinite(self.primary_metric) and math.isfinite(self.secondary_metric)):
+            raise ValueError("Metrics must be finite numbers")
+
 
 @dataclass
 class AgentTelemetryAlert:
