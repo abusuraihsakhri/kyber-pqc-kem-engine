@@ -1,5 +1,5 @@
 """
-Prometheus Operational Metrics Exporter for kyber-pqc-kem-engine.
+Prometheus-format Operational Metrics Exporter for kyber-pqc-kem-engine.
 """
 import time
 from typing import Dict, Any

@@ -1,190 +1,74 @@
 # Kyber PQC KEM Engine
 
-> **Domain:** Post-Quantum Cryptography & Zero-Knowledge Architecture
-> **Reference Guidelines & Standards:** `NIST FIPS 203/204/205, NIST SP 800-90B & ISO/IEC Standards`
+**Rule-based telemetry demonstration.** This repository evaluates numerical thresholds, descriptor keywords, and critical flags through Python CLI/API workflows and a static browser console.
 
-<div align="center">
+> **Security scope:** Despite its historical name, this project **does not implement ML-KEM (Kyber)** key generation, encapsulation, decapsulation, NTT arithmetic, hybrid TLS, FIPS 203 test-vector validation, or cryptographic module certification. It must not be used to establish keys, protect traffic, or assert post-quantum security. See [NIST FIPS 203](https://csrc.nist.gov/pubs/fips/203/final) for the actual ML-KEM specification.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-3776AB.svg?logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688.svg?logo=fastapi&logoColor=white)
-![Audit Trail](https://img.shields.io/badge/Audit-HMAC--SHA256_Tamper--Evident-brightgreen.svg)
-![Zero-PHI Guard](https://img.shields.io/badge/Guard-Zero--PHI_Outbound-blue.svg)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker&logoColor=white)
+## Functionality
 
-</div>
+- Deterministic threshold alerts, descriptor anomaly detection, and critical-flag escalation
+- Python CLI for single evaluations, CSV batch processing, deterministic mock chat, in-memory HMAC audit verification, and a FastAPI server
+- Separate legacy package CLI and numerical enrichment demonstrations (not cryptographic benchmarks or conformance testing)
+- Browser-only telemetry form in **web/index.html**, with JSON export and no network requests
+- HMAC-SHA256 hash-chained audit records held in **process memory only**; no durable storage or external anchoring
 
----
+The root evaluator flags primary metric greater than **25**, secondary metric greater than **12**, and descriptor keywords such as DISCORDANT, ANOMALY, MUTANT, VIOLATION, FAIL, or REJECT. A critical flag takes priority. These are *demonstration heuristics*, not NIST standards. The legacy package CLI uses a secondary limit of **10**.
 
-## 📖 What It Does
+## Browser demonstration
 
-**Kyber PQC KEM Engine** is an advanced analytical and computational platform implementing NIST FIPS 203 ML-KEM (Kyber-512/768/1024) lattice-based polynomial arithmetic & hybrid X25519-Kyber key exchange.
+Open **web/index.html** directly in a modern desktop or mobile browser. Enter numeric metrics, select **Evaluate**, and optionally **Export JSON**. The app validates finite numbers and clearly distinguishes simulated rule decisions from cryptographic security assessments.
 
-The system provides a multi-agent evaluation framework with specialized workers for quality control, safety escalation, and protocol conformance monitoring.
+The Pages workflow at **.github/workflows/pages.yml** can publish the static web directory when GitHub Pages has been configured with **GitHub Actions** as its source. A public URL should only be published after verifying deployment.
 
----
+**Privacy:** Browser inputs remain local, and no results are persisted after reload. Avoid identifiable personal data and secrets. The Python API is unauthenticated; bind it to loopback or protect it with an authentication gateway if exposing it beyond a trusted host. The regex-based identifier filter is not a HIPAA de-identification guarantee.
 
-## ⚙️ Key Capabilities & Algorithmic Modules
+## Installation and usage
 
-- **Deterministic Calculation Engine**: Strict compliance with standard reference formulations and thresholds.
-- **Risk & Urgency Classification**: Multi-tier categorization with automated clinical/operational action recommendations.
-- **Validation & Guardrails**: Rigorous input bounds checking and anomaly detection.
-- **Zero-PHI Outbound Interceptor**: Active regex inspection blocking SSNs, MRNs, phone numbers, and patient identifiers.
-- **Tamper-Evident HMAC-SHA256 Audit Trail**: Chained, cryptographically signed logs with full signature verification.
+CI tests Python 3.10, 3.11, and 3.12. Package metadata allows Python >=3.9, but CI does not separately test 3.9.
 
----
-
-## 🚀 Installation
-
-```bash
-# Clone the repository
+~~~bash
 git clone https://github.com/abusuraihsakhri/kyber-pqc-kem-engine.git
 cd kyber-pqc-kem-engine
+python -m pip install -e ".[server,test]"
+kyber-pqc-kem-engine audit --task-id TASK-001 --target KEY-01 --primary 28.5 --secondary 14.2 --critical --status DISCORDANT
+kyber-pqc-kem-engine chat "status"
+kyber-pqc-kem-engine batch -i sample.csv -o results.csv
+kyber-pqc-kem-engine verify-audit
+kyber-pqc-kem-engine serve --host 127.0.0.1 --port 8000
+~~~
 
-# Install dependencies
-pip install fastapi uvicorn pydantic pytest
+The installed command invokes the **root CLI**, matching python cli.py. For the independent legacy workflow, run python -m kyber_pqc_kem.cli.
 
-# (Optional) Copy environment configuration
-cp .env.example .env
-# Edit .env to set your AUDIT_SECRET_KEY
-```
+CSV columns: task_id, target_identifier, primary_metric, secondary_metric, status_descriptor, is_critical_flag. Boolean values accept true/false, 1/0, yes/no, or blank (false); invalid values are rejected. Batch input and output paths must differ.
 
----
+With the server running, browse http://127.0.0.1:8000/docs for interactive API documentation. Endpoints include /health, /metrics (JSON), /api/audit, /api/chat (local mock), and /api/audit/logs. No external model provider is implemented. Audit-chain verification is limited to records in the *current running process*; a fresh CLI invocation has an empty chain.
 
-## 💻 CLI Quickstart & Usage
+## Configuration and security
 
-### 1. Run Single Task Evaluation
-```bash
-python cli.py audit --task-id TASK-001 --target KEY-01 --primary 28.5 --secondary 14.2 --critical --status DISCORDANT
-```
+The audit HMAC secret is read from the AUDIT_SECRET_KEY environment variable. If unset, a random process-local key is used and cannot be recovered after restart. The example .env file is not automatically loaded.
 
-### 2. Interactive Chat Query
-```bash
-python cli.py chat "What is the system status?"
-```
+~~~bash
+export AUDIT_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_hex(32))')"
+python -m cli serve --host 127.0.0.1 --port 8000
+~~~
 
-### 3. Batch Process CSV Records
-```bash
-python cli.py batch -i sample.csv -o results.csv
-```
+For containers, docker compose up --build requires AUDIT_SECRET_KEY and publishes only to localhost on port 8000. The audit ledger is not a durable evidence store. Do not expose the API publicly without application-layer authentication.
 
-### 4. Verify Audit Trail Integrity
-```bash
-python cli.py verify-audit
-```
+## Tests
 
-### 5. Launch FastAPI REST Server
-```bash
-python cli.py serve --host 127.0.0.1 --port 8000
-```
+~~~bash
+python -m pytest -v
+python -m compileall -q agents kyber_pqc_kem cli.py enrichment.py simulator.py
+node tests/web-smoke.cjs
+python simulator.py 100
+~~~
 
-### Parameter Reference
-- `--task-id`: Unique task identifier (default: TASK-2026-001)
-- `--target`: Target entity identifier (default: KEY-TARGET-01)
-- `--primary`: Primary measurement value (float, default: 28.5)
-- `--secondary`: Secondary measurement value (float, default: 14.2)
-- `--critical`: Flag for critical/emergency status (default: False)
-- `--status`: Status descriptor (default: DISCORDANT)
+CI additionally checks package installation and dependency consistency. The simulator produces synthetic telemetry; it is not a PQC performance benchmark.
 
-### Input Data Schema (CSV Batch)
+## Technology and compatibility
 
-| Field | Description | Requirement |
-|:------|:------------|:------------|
-| `task_id` | Parameter / observation metric | Required |
-| `target_identifier` | Parameter / observation metric | Required |
-| `primary_metric` | Primary measurement value | Required |
-| `secondary_metric` | Secondary measurement value | Optional |
-| `is_critical_flag` | Emergency escalation flag | Optional |
-| `status_descriptor` | Status code descriptor | Optional |
+Python, Pydantic v2, optional FastAPI/Uvicorn, HTML/CSS/vanilla JavaScript. The static web interface requires neither Pyodide nor a Python server. GitHub Pages cannot host the Python API.
 
----
+## License
 
-## 🛡️ Security & Enterprise Architecture
-
-* **Zero-PHI Outbound Interceptor:** Active regex inspection blocking SSNs, MRNs, phone numbers, and patient identifiers.
-* **Tamper-Evident HMAC-SHA256 Audit Trail:** Chained, cryptographically signed logs with full signature verification for every evaluation and state transition.
-* **Secure Key Generation:** Cryptographically secure random key generation when no explicit key is configured.
-* **Path Traversal Protection:** Input file paths are validated and resolved safely.
-* **FastAPI & Prometheus Telemetry:** Exposes OpenAPI 3.1 REST endpoints and operational Prometheus metrics (`/metrics`).
-
-### Environment Variables
-
-| Variable | Description | Required |
-|:---------|:------------|:---------|
-| `AUDIT_SECRET_KEY` | Secret key for HMAC-SHA256 audit signing (min 32 bytes recommended) | Recommended |
-| `MODEL_PROVIDER` | LLM provider for chat features (mock, ollama, claude, openai) | No (default: mock) |
-| `API_HOST` | API server bind address | No (default: 127.0.0.1) |
-| `API_PORT` | API server port | No (default: 8000) |
-
-Generate a secure audit key:
-```bash
-python -c "import secrets; print(secrets.token_hex(32))"
-```
-
----
-
-## 🧪 Testing & Verification
-
-Run the automated test suite:
-
-```bash
-pytest -v
-```
-
-Execute high-throughput batch simulation benchmarks:
-
-```bash
-python simulator.py 1000
-```
-
----
-
-## 🐳 Container Deployment
-
-```bash
-# Build and run with Docker Compose
-AUDIT_SECRET_KEY=$(python -c "import secrets; print(secrets.token_hex(32))") docker-compose up -d
-
-# Or build and run manually
-docker build -t kyber-pqc-kem-engine .
-docker run -p 8000:8000 -e AUDIT_SECRET_KEY=your-secure-key kyber-pqc-kem-engine
-```
-
----
-
-## 📁 Project Structure
-
-```
-kyber-pqc-kem-engine/
-├── agents/                  # Enterprise analytical suite
-│   ├── api.py              # FastAPI REST endpoints
-│   ├── base.py             # Security, PHI guard, audit trail
-│   ├── models.py           # Pydantic data models
-│   ├── supervisor.py       # Multi-agent orchestrator
-│   ├── workers.py          # Specialized evaluation workers
-│   ├── llm_factory.py      # LLM provider factory
-│   ├── learning.py         # Bayesian calibration engine
-│   ├── metrics.py          # Prometheus metrics collector
-│   └── streamer.py         # WebSocket telemetry broadcaster
-├── kyber_pqc_kem/          # ML-KEM / CRYSTALS-Kyber engine
-│   ├── agents.py           # PQC coordination agents
-│   ├── cli.py              # CLI interface
-│   ├── engine.py           # Core algorithmic engine
-│   ├── models.py           # Data models
-│   └── server.py           # FastAPI server factory
-├── tests/                  # Test suite
-├── web/                    # Operations console (HTML)
-├── cli.py                  # Main CLI entry point
-├── simulator.py            # High-throughput simulation
-├── enrichment.py           # Enrichment feature suite
-├── pyproject.toml          # Project configuration
-├── Dockerfile              # Container build
-├── docker-compose.yml      # Container orchestration
-└── .github/workflows/      # CI/CD pipeline
-```
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+[MIT](LICENSE).

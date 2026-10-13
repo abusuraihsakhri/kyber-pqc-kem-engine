@@ -93,7 +93,7 @@ class PQCKeyAgreementCoordinator:
             "critical_count": crit_count,
             "warning_count": warn_count,
             "alerts": [a.to_dict() for a in all_alerts],
-            "standard_specification": "NIST FIPS 203 (ML-KEM Standard)",
+            "standard_specification": "NIST FIPS 203 reference only; no ML-KEM testing performed",
             "consensus_summary": f"Consensus evaluation completed across 3 sub-agents with status [{status.value}].",
         }
 
@@ -105,6 +105,6 @@ class PQCKeyAgreementCoordinator:
         if "status" in q or "ledger" in q:
             return f"ML-KEM / CRYSTALS-Kyber Post-Quantum Key Encapsulation Mechanism & Hybrid TLS Engine currently managing {len(self.execution_ledger)} execution tasks in air-gapped memory."
         elif "standard" in q or "spec" in q:
-            return "Active runtime operating strictly according to NIST FIPS 203 (ML-KEM Standard) specifications."
+            return "This telemetry demonstration does not implement or validate NIST FIPS 203 ML-KEM."
         else:
-            return f"ML-KEM / CRYSTALS-Kyber Post-Quantum Key Encapsulation Mechanism & Hybrid TLS Engine executive coordinator online. Zero-telemetry on-premises surveillance active."
+            return f"ML-KEM / CRYSTALS-Kyber Post-Quantum Key Encapsulation Mechanism & Hybrid TLS Engine telemetry coordinator online. This is not a cryptographic KEM implementation."

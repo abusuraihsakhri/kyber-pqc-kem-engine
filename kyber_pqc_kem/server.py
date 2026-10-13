@@ -1,5 +1,5 @@
 """
-FastAPI REST API Server for ML-KEM / CRYSTALS-Kyber Post-Quantum Key Encapsulation Mechanism & Hybrid TLS Engine.
+Legacy FastAPI telemetry interface; no ML-KEM primitives are executed.
 """
 from typing import Dict, Any
 from .models import FrontierPayload
@@ -11,22 +11,22 @@ coordinator = PQCKeyAgreementCoordinator()
 def create_app():
     try:
         from fastapi import FastAPI
-        from pydantic import BaseModel
+        from pydantic import BaseModel, Field
 
         app = FastAPI(
-            title="ML-KEM / CRYSTALS-Kyber Post-Quantum Key Encapsulation Mechanism & Hybrid TLS Engine",
-            description="Implements NIST FIPS 203 ML-KEM (Kyber-512/768/1024) lattice-based polynomial arithmetic over NTT rings with hybrid X25519-Kyber768 key exchange.",
+            title="Legacy telemetry rules demo (not ML-KEM cryptography)",
+            description="Legacy threshold-based telemetry API. Does not perform ML-KEM operations or hybrid TLS.",
             version="2.0.0-FRONTIER",
         )
 
         class TaskRequest(BaseModel):
             task_id: str = "TASK-2026-001"
             target_identifier: str = "TARGET-BIO-KEY"
-            primary_metric: float = 28.5
-            secondary_metric: float = 14.2
+            primary_metric: float = Field(default=28.5, allow_inf_nan=False)
+            secondary_metric: float = Field(default=14.2, allow_inf_nan=False)
             status_descriptor: str = "DISCORDANT_ANOMALY"
             is_critical_flag: bool = True
-            attributes: Dict[str, Any] = {}
+            attributes: Dict[str, Any] = Field(default_factory=dict)
 
         class ChatRequest(BaseModel):
             query: str

@@ -25,6 +25,8 @@ class SystemSupervisor:
         PHIGuard.assert_no_phi(payload.task_id)
         PHIGuard.assert_no_phi(payload.target_identifier)
         PHIGuard.assert_no_phi(payload.status_descriptor)
+        import json
+        PHIGuard.assert_no_phi(json.dumps(payload.attributes))
 
         # Multi-worker evaluations
         all_alerts: List[AgentAlert] = []
@@ -75,5 +77,5 @@ class SystemSupervisor:
 
     def query_supervisory_chat(self, query: str) -> str:
         PHIGuard.assert_no_phi(query)
-        prompt = f"Supervisor inquiry for Kyber Pqc Kem Engine under NIST FIPS 203/204/205 / ISO/IEC 17825 Standards: {query}"
+        prompt = f"Supervisor inquiry for Kyber Pqc Kem Engine (local telemetry demo, no ML-KEM validation): {query}"
         return self.llm.invoke(prompt)

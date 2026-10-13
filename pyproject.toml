@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "kyber-pqc-kem-engine"
 version = "2.0.0"
-description = "ML-KEM / CRYSTALS-Kyber Post-Quantum Key Encapsulation Mechanism & Hybrid TLS Engine"
+description = "Heuristic protocol telemetry and audit demonstration; not an ML-KEM implementation"
 readme = "README.md"
 authors = [{ name = "Dr. Abu Suraih Sakhri", email = "abusuraih@example.com" }]
 license = { text = "MIT" }
@@ -17,10 +17,18 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 requires-python = ">=3.9"
-dependencies = []
+dependencies = ["pydantic>=2,<3"]
+
+[project.optional-dependencies]
+server = ["fastapi>=0.100", "uvicorn>=0.23"]
+test = ["pytest>=7", "httpx>=0.24"]
+
+[tool.setuptools]
+packages = ["agents", "kyber_pqc_kem"]
+py-modules = ["cli", "enrichment", "simulator", "kyber_pqc_kem_app"]
 
 [project.scripts]
-kyber-pqc-kem-engine = "kyber_pqc_kem.cli:main"
+kyber-pqc-kem-engine = "cli:main"
 
 [project.urls]
 Homepage = "https://github.com/abusuraihsakhri/kyber-pqc-kem-engine"

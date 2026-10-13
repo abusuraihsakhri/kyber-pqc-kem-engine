@@ -1,5 +1,5 @@
 """
-Core Algorithmic Engine & Cryptographic / Biological Logic for ML-KEM / CRYSTALS-Kyber Post-Quantum Key Encapsulation Mechanism & Hybrid TLS Engine.
+Legacy numerical threshold evaluator; does not implement ML-KEM.
 Domain: Post-Quantum Cryptography
 Standard: NIST FIPS 203 (ML-KEM Standard)
 """
@@ -18,7 +18,7 @@ class FrontierDomainEngine:
         if value > cls.PRIMARY_BOUND:
             return {
                 "summary": "Primary Domain Boundary Deviation",
-                "details": f"Parameter value ({value:.3f}) exceeds operational threshold ({cls.PRIMARY_BOUND:.1f}) under NIST FIPS 203 (ML-KEM Standard).",
+                "details": f"Parameter value ({value:.3f}) exceeds operational threshold ({cls.PRIMARY_BOUND:.1f}) under local demonstration thresholds (not FIPS 203 validation).",
                 "remediation": "Engage parameter recalibration and algorithmic verification routine.",
             }
         return None
@@ -39,7 +39,7 @@ class FrontierDomainEngine:
         if any(flag in desc_upper for flag in ["VIOLATION", "DISCORDANT", "ANOMALY", "MUTANT", "LEAK"]):
             return {
                 "summary": "Specification / Protocol Anomaly Identified",
-                "details": f"Telemetry status flag '{descriptor}' violates NIST FIPS 203 (ML-KEM Standard) conformance matrix.",
+                "details": f"Telemetry status flag '{descriptor}' matches a local anomaly keyword (not an ML-KEM conformance determination).",
                 "remediation": "Execute automated rollback or secondary consensus verification.",
             }
         return None

@@ -1,5 +1,5 @@
 """
-Command-Line Interface for ML-KEM / CRYSTALS-Kyber Post-Quantum Key Encapsulation Mechanism & Hybrid TLS Engine.
+Command-Line Interface for Kyber-named legacy telemetry rules demonstration (no key encapsulation).
 """
 import argparse
 import csv
@@ -13,7 +13,7 @@ coordinator = PQCKeyAgreementCoordinator()
 
 
 def _safe_resolve_path(file_path: str, must_exist: bool = False) -> Path:
-    """Resolve and validate file path, preventing path traversal."""
+    """Resolve a user-selected filesystem path; this is not a sandbox boundary."""
     try:
         resolved = Path(file_path).resolve()
     except (OSError, ValueError) as e:
@@ -23,6 +23,18 @@ def _safe_resolve_path(file_path: str, must_exist: bool = False) -> Path:
         raise argparse.ArgumentTypeError(f"File not found: {resolved}")
 
     return resolved
+
+
+def parse_csv_bool(value: str) -> bool:
+    """Interpret CSV boolean cells without Python's truthiness-of-string trap."""
+    if isinstance(value, bool):
+        return value
+    value = str(value or "").strip().lower()
+    if value in {"", "0", "false", "no", "n", "off"}:
+        return False
+    if value in {"1", "true", "yes", "y", "on"}:
+        return True
+    raise ValueError(f"Invalid is_critical_flag value: {value!r}")
 
 
 def main(argv=None):
@@ -66,7 +78,7 @@ def main(argv=None):
         dossier = coordinator.process(payload)
         print("=" * 80)
         print(f"  ML-KEM / CRYSTALS-KYBER POST-QUANTUM KEY ENCAPSULATION MECHANISM & HYBRID TLS ENGINE")
-        print(f"  Domain: Post-Quantum Cryptography | Standard: NIST FIPS 203 (ML-KEM Standard)")
+        print(f"  Local threshold demonstration; not an FIPS 203 test")
         print(f"  Task: {dossier['task_id']} | Status: [{dossier['overall_status']}] | Total Alerts: {dossier['total_alerts']}")
         print("=" * 80)
         for a in dossier["alerts"]:
@@ -90,7 +102,7 @@ def main(argv=None):
             fieldnames = list(reader.fieldnames or [])
             rows = list(reader)
 
-        out_fields = fieldnames + ["overall_status", "total_alerts", "critical_count", "consensus_summary"]
+        out_fields = list(dict.fromkeys(fieldnames + ["overall_status", "total_alerts", "critical_count", "consensus_summary"]))
         out_rows = []
         for r in rows:
             payload = FrontierPayload(
@@ -99,7 +111,7 @@ def main(argv=None):
                 primary_metric=float(r.get("primary_metric", 15.0)),
                 secondary_metric=float(r.get("secondary_metric", 5.0)),
                 status_descriptor=r.get("status_descriptor", "NOMINAL"),
-                is_critical_flag=bool(r.get("is_critical_flag", False)),
+                is_critical_flag=parse_csv_bool(r.get("is_critical_flag", False)),
             )
             dossier = coordinator.process(payload)
             row_dict = dict(r)
@@ -108,6 +120,9 @@ def main(argv=None):
             row_dict["critical_count"] = dossier["critical_count"]
             row_dict["consensus_summary"] = dossier["consensus_summary"]
             out_rows.append(row_dict)
+
+        if input_path == output_path:
+            raise ValueError("Input and output paths must differ to avoid overwriting source data")
 
         with open(output_path, mode="w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=out_fields)
