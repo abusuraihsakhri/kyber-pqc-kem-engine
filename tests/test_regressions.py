@@ -97,3 +97,17 @@ def test_simulator_rejects_zero_iterations():
     from simulator import run_simulation
     with pytest.raises(ValueError, match="positive"):
         run_simulation(0)
+
+
+def test_api_guard_returns_422_without_exposing_identifier():
+    from fastapi.testclient import TestClient
+    from agents.api import app
+    client = TestClient(app)
+    response = client.post("/api/audit", json={
+        "task_id": "MRN-123456", "target_identifier": "KEY-01",
+        "primary_metric": 5.0,
+    })
+    assert response.status_code == 422
+    assert "MRN-123456" not in response.text
+    response = client.post("/api/chat", json={"query": "MRN-123456"})
+    assert response.status_code == 422
