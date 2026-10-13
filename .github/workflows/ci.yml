@@ -30,6 +30,9 @@ jobs:
       run: |
         python -m pytest -v
         python -m compileall -q agents kyber_pqc_kem cli.py enrichment.py simulator.py
+        python -m pip check
+        kyber-pqc-kem-engine --help
+        node tests/web-smoke.cjs
 
     - name: Security SAST & Zero-PHI Audit
       run: |
