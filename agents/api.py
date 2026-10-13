@@ -12,7 +12,7 @@ supervisor = SystemSupervisor(model_provider="mock")
 
 app = FastAPI(
     title="Kyber Pqc Kem Engine API",
-    description="Enterprise Distributed Component Platform (Post-Quantum Cryptography & Hardware Security)",
+    description="Local heuristic telemetry demonstration. No ML-KEM cryptographic operations or FIPS conformance validation.",
     version="3.0.0-ENTERPRISE",
 )
 
@@ -23,7 +23,7 @@ class ChatRequest(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"status": "HEALTHY", "service": "kyber-pqc-kem-engine", "domain": "Post-Quantum Cryptography & Hardware Security", "standard": "NIST FIPS 203/204/205 / ISO/IEC 17825 Standards", "version": "3.0.0-ENTERPRISE"}
+    return {"status": "HEALTHY", "service": "kyber-pqc-kem-engine", "domain": "Post-Quantum Cryptography & Hardware Security", "cryptographic_kem_implemented": False, "version": "3.0.0-ENTERPRISE"}
 
 
 @app.get("/metrics")
@@ -52,4 +52,4 @@ def api_chat(req: ChatRequest):
 
 @app.get("/api/audit/logs")
 def api_audit_logs():
-    return {"audit_trail": AuditLogger.get_trail(), "verified": AuditLogger.verify_integrity()}
+    return {"audit_trail": AuditLogger.get_trail(), "verified": AuditLogger.verify_integrity(), "scope": "ephemeral in-process HMAC chain; not persistent or externally anchored"}
