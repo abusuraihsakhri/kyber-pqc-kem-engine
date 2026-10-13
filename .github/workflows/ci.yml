@@ -1,4 +1,4 @@
-name: Kyber Pqc Kem Engine CI/CD & Security Verification
+name: Kyber telemetry tests and browser checks
 
 on:
   push:
@@ -34,11 +34,11 @@ jobs:
         kyber-pqc-kem-engine --help
         node tests/web-smoke.cjs
 
-    - name: Security SAST & Zero-PHI Audit
+    - name: Smoke-check in-memory audit-chain integrity
       run: |
         python -c "
         from agents.base import PHIGuard, AuditLogger
         import pytest
         assert AuditLogger.verify_integrity() is True
-        print('Security & Zero-PHI Audit Passed!')
+        print('Audit-chain smoke check passed')
         "
